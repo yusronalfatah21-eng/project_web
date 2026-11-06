@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mentor - KodeCamp</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+    <style>
+        html { scroll-behavior: smooth; overflow-x: hidden; }
+        body { background-color: #e1ebf5f2; font-family: 'Segoe UI', sans-serif; }
+
+        .avatar { width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; font-weight: 700; flex-shrink: 0; }
+        .mentor-card { transition: transform .2s ease, box-shadow .2s ease; }
+        .mentor-card:hover { transform: translateY(-4px); box-shadow: 0 .75rem 1.5rem rgba(0,0,0,.12) !important; }
+        .filter-btn[aria-pressed="true"] { background-color: #0d6efd; border-color: #0d6efd; color: #fff; }
+        .stat-number { font-size: 2rem; font-weight: 700; line-height: 1; }
+
+        @media (prefers-reduced-motion: reduce) {
+            html { scroll-behavior: auto; }
+            .mentor-card { transition: none; }
+            .mentor-card:hover { transform: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm sticky-top py-2">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="index.html"><i class="bi bi-laptop me-2 text-warning"></i>KodeCamp</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-lg-center">
+                    <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="index.html#tentang">Tentang</a></li>
+                    <li class="nav-item"><a class="nav-link" href="index.html#fasilitas">Fasilitas</a></li>
+                    <li class="nav-item"><a class="nav-link" href="index.html#program">Program</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="mentor.html">Mentor</a></li>
+                    <li class="nav-item"><a class="nav-link" href="index.html#faq">FAQ</a></li>
+                    <li class="nav-item ms-lg-2 mt-2 mt-lg-0">
+                        <a class="btn btn-warning btn-sm rounded-pill px-3 fw-bold text-dark" href="transaksi.html">
+                            <i class="bi bi-journal-check me-1"></i> Katalog & Pendaftaran
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header -->
+    <section class="container pt-5 pb-3">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-1">
+                <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Mentor</li>
+            </ol>
+        </nav>
+        <h2 class="fw-bold text-dark">Belajar langsung dari praktisi</h2>
+        <p class="text-muted col-lg-7 px-0">Setiap program dipandu mentor yang bekerja di bidangnya. Pilih program untuk melihat siapa yang akan membimbing Anda, lalu konsultasi langsung lewat WhatsApp.</p>
+
+        <!-- Ringkasan (dihitung otomatis dari data) -->
+        <div class="row g-3 mt-2" id="statistik"></div>
+    </section>
+
+    <!-- Filter + Daftar Mentor -->
+    <section class="container pb-5">
+        <div class="d-flex flex-wrap gap-2 my-4" id="filter-container" role="group" aria-label="Filter mentor berdasarkan program"></div>
+        <div class="row g-4" id="mentor-container"></div>
+        <p class="text-muted text-center d-none mt-4" id="mentor-kosong">Belum ada mentor untuk program ini.</p>
+    </section>
+
+    <!-- CTA -->
+    <section class="bg-white py-5 shadow-sm">
+        <div class="container text-center">
+            <h4 class="fw-bold mb-2">Sudah menemukan program yang cocok?</h4>
+            <p class="text-muted mb-4">Pilih program, atur jadwal mulai, dan kirim pendaftaran lewat WhatsApp.</p>
+            <a href="transaksi.html" class="btn btn-warning btn-lg rounded-pill shadow-sm px-4 fw-bold">Daftar Sekarang <i class="bi bi-arrow-right ms-2"></i></a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-warning text-black text-center py-3 mt-auto">
+        <small class="fw-semibold">&copy; 2026 KodeCamp Indonesia.</small>
+    </footer>
+
+    <script src="../produkdata.js"></script>
+    <script src="../mentordata.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let programAktif = 'semua';
+
+        // Nomor WhatsApp admin (sama dengan di transaksi.html)
+        const nomorAdminWhatsApp = "6287843893138";
+
+        // Warna avatar mengikuti warna program di produkdata.js
+        const warnaAvatar = {
+            fullstack: "bg-primary-subtle text-primary",
+            datascience: "bg-warning-subtle text-warning",
+            uiux: ""
+        };
+        const styleAvatar = {
+            uiux: "background-color: rgb(253, 213, 219); color: rgb(247, 110, 110);"
+        };
+
+        function escapeHtml(teks) {
+            const d = document.createElement('div');
+            d.textContent = teks;
+            return d.innerHTML;
+        }
+
+        function inisial(nama) {
+            return nama.split(' ').slice(0, 2).map(k => k[0]).join('').toUpperCase();
+        }
+
+        function namaProgram(id) {
+            const k = daftarKursus.find(k => k.id === id);
+            return k ? k.nama : id;
+        }
+
+        function renderStatistik() {
+            const totalTahun = daftarMentor.reduce((t, m) => t + m.pengalaman, 0);
+            const jumlahPerusahaan = new Set(daftarMentor.map(m => m.perusahaan)).size;
+            const item = [
+                { angka: daftarMentor.length, label: "Mentor", ikon: "bi-people", warna: "text-primary" },
+                { angka: totalTahun + "+", label: "Tahun pengalaman gabungan", ikon: "bi-clock-history", warna: "text-warning" },
+                { angka: jumlahPerusahaan, label: "Perusahaan asal mentor", ikon: "bi-buildings", warna: "text-success" }
+            ];
+            document.getElementById('statistik').innerHTML = item.map(s => `
+                <div class="col-md-4">
+                    <div class="bg-white rounded-4 shadow-sm p-3 d-flex align-items-center">
+                        <i class="bi ${s.ikon} ${s.warna} fs-2 me-3"></i>
+                        <div>
+                            <div class="stat-number">${s.angka}</div>
+                            <small class="text-muted">${s.label}</small>
+                        </div>
+                    </div>
+                </div>`).join('');
+        }
+
+        function renderFilter() {
+            const pilihan = [{ id: 'semua', nama: 'Semua program' }, ...daftarKursus.map(k => ({ id: k.id, nama: k.nama }))];
+            document.getElementById('filter-container').innerHTML = pilihan.map(p => `
+                <button type="button" class="btn btn-outline-primary rounded-pill px-3 filter-btn"
+                        aria-pressed="${p.id === programAktif}" onclick="pilihProgram('${p.id}')">
+                    ${escapeHtml(p.nama)}
+                </button>`).join('');
+        }
+
+        function renderMentor() {
+            const container = document.getElementById('mentor-container');
+            const daftar = programAktif === 'semua' ? daftarMentor : daftarMentor.filter(m => m.program === programAktif);
+
+            document.getElementById('mentor-kosong').classList.toggle('d-none', daftar.length > 0);
+
+            container.innerHTML = daftar.map(m => {
+                const kursus = daftarKursus.find(k => k.id === m.program) || {};
+                const pesan = `Halo Admin KodeCamp, saya tertarik program ${namaProgram(m.program)} dan ingin berkonsultasi dengan mentor ${m.nama}. Mohon informasi jadwal yang tersedia. Terima kasih!`;
+                const linkWA = `https://wa.me/${nomorAdminWhatsApp}?text=${encodeURIComponent(pesan)}`;
+                const avatarClass = warnaAvatar[m.program] || "bg-light text-secondary";
+                const avatarStyle = styleAvatar[m.program] || "";
+
+                return `
+                <div class="col-md-6 col-lg-4">
+                    <div class="card mentor-card border-0 shadow-sm rounded-4 h-100 p-4 bg-white">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="avatar ${avatarClass}" style="${avatarStyle}" aria-hidden="true">${inisial(m.nama)}</div>
+                            <div class="ms-3">
+                                <h5 class="fw-bold mb-0">${escapeHtml(m.nama)}</h5>
+                                <small class="text-muted">${escapeHtml(m.jabatan)}</small><br>
+                                <small class="text-muted"><i class="bi bi-building me-1"></i>${escapeHtml(m.perusahaan)}</small>
+                            </div>
+                        </div>
+                        <div class="mb-2">
+                            <span class="badge ${kursus.badgeClass || 'bg-secondary-subtle text-secondary'} fw-semibold">${escapeHtml(namaProgram(m.program))}</span>
+                            <span class="badge bg-light text-dark fw-semibold border"><i class="bi bi-briefcase me-1"></i>${m.pengalaman} tahun</span>
+                        </div>
+                        <p class="text-muted small flex-grow-1">${escapeHtml(m.bio)}</p>
+                        <div class="mb-3 d-flex flex-wrap gap-1">
+                            ${m.keahlian.map(k => `<span class="badge rounded-pill bg-primary-subtle text-primary fw-normal">${escapeHtml(k)}</span>`).join('')}
+                        </div>
+                        <a href="${linkWA}" target="_blank" rel="noopener" class="btn btn-success rounded-pill fw-bold">
+                            <i class="bi bi-whatsapp me-1"></i> Konsultasi via WhatsApp
+                        </a>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        function pilihProgram(id) {
+            programAktif = id;
+            renderFilter();
+            renderMentor();
+        }
+
+        renderStatistik();
+        renderFilter();
+        renderMentor();
+    </script>
+</body>
+</html>

@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pendaftaran & Transaksi - KodeCamp</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+    <style>
+        body { background-color: #e1ebf5f2; font-family: 'Segoe UI', sans-serif; }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm sticky-top py-2">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="index.html"><i class="bi bi-laptop me-2 text-warning"></i>KodeCamp</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-lg-center">
+                    <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="index.html#tentang">Tentang</a></li>
+                    <li class="nav-item"><a class="nav-link" href="index.html#fasilitas">Fasilitas</a></li>
+                    <li class="nav-item"><a class="nav-link" href="index.html#program">Program</a></li>
+                    <li class="nav-item"><a class="nav-link" href="mentor.html">Mentor</a></li>
+                    <li class="nav-item"><a class="nav-link" href="index.html#faq">FAQ</a></li>
+                    <li class="nav-item ms-lg-2 mt-2 mt-lg-0">
+                        <a class="btn btn-warning btn-sm rounded-pill px-3 fw-bold text-dark" href="transaksi.html">
+                            <i class="bi bi-journal-check me-1"></i> Katalog & Pendaftaran
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Konten Pendaftaran & Transaksi -->
+    <section class="container py-5">
+        <div class="row mb-4 align-items-center">
+            <div class="col-md-8">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-1">
+                        <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Katalog & Pendaftaran</li>
+                    </ol>
+                </nav>
+                <h2 class="fw-bold text-dark">Katalog Kursus & Pendaftaran</h2>
+                <p class="text-muted">Pilih program bootcamp favorit Anda dan daftarkan diri Anda sekarang untuk memulai perjalanan karier teknologi.</p>
+            </div>
+            <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                <a href="index.html" class="btn btn-outline-primary rounded-pill px-4">
+                    <i class="bi bi-arrow-left me-2"></i> Kembali ke Beranda
+                </a>
+            </div>
+        </div>
+
+        <form id="formPendaftaran" onsubmit="handleWhatsAppRegister(event)">
+            <div class="row g-4">
+                <!-- Kolom Kiri: Katalog Dinamis & Form Detail Pemesanan -->
+                <div class="col-lg-7">
+                    <h4 class="fw-bold mb-3"><i class="bi bi-grid-fill text-primary me-2"></i> Pilihan Program Tersedia</h4>
+                    
+                    <!-- Container untuk Katalog Dinamis -->
+                    <div id="katalog-container"></div>
+
+                    <!-- Card Detail Pemesanan -->
+                    <div class="card border-0 shadow-sm rounded-4 p-4 bg-white mt-4">
+                        <h4 class="fw-bold mb-3 text-dark fs-5"><i class="bi bi-sliders text-primary me-2"></i> Detail Pemesanan</h4>
+                        
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">Metode Belajar</label>
+                            <select class="form-select rounded-3" id="metodeBelajar" onchange="hitungTotal()">
+                                <option value="Online">Online (Rp 0)</option>
+                                <option value="Offline (Tatap Muka)">Offline / Tatap Muka (+Rp 250.000)</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">Tanggal Mulai</label>
+                            <input type="date" class="form-control rounded-3" id="tanggalMulai" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">Durasi (minggu)</label>
+                            <input type="number" class="form-control rounded-3" id="durasiMinggu" value="1" min="1" oninput="hitungTotal()">
+                        </div>
+
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" id="checkSertifikat" onchange="hitungTotal()">
+                            <label class="form-check-label small fw-semibold" for="checkSertifikat">
+                                Sertifikat Resmi (+Rp 50.000)
+                            </label>
+                        </div>
+
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="checkMagang" onchange="hitungTotal()">
+                            <label class="form-check-label small fw-semibold" for="checkMagang">
+                                Program Penyaluran Magang (+Rp 150.000)
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Card Ringkasan Total Biaya -->
+                    <div class="card border-0 shadow-sm rounded-4 p-4 bg-white mt-4">
+                        <h4 class="fw-bold mb-3 text-dark fs-5"><i class="bi bi-receipt text-success me-2"></i> Ringkasan Pembayaran</h4>
+                        <div class="d-flex justify-content-between mb-2 text-muted small">
+                            <span id="label-kursus">Harga Kursus:</span>
+                            <span id="val-harga-kursus">Rp 0</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2 text-muted small">
+                            <span id="label-durasi">Biaya durasi (1 minggu):</span>
+                            <span id="val-biaya-durasi">Rp 0</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2 text-muted small">
+                            <span>Subtotal:</span>
+                            <span id="val-subtotal">Rp 0</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2 text-muted small">
+                            <span>Biaya Sertifikat:</span>
+                            <span id="val-sertifikat">Rp 0</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2 text-muted small">
+                            <span>Magang:</span>
+                            <span id="val-magang">Rp 0</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2 text-muted small">
+                            <span>Biaya Metode Belajar:</span>
+                            <span id="val-metode">Rp 0</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-3 text-muted small">
+                            <span>Pajak (10%):</span>
+                            <span id="val-pajak">Rp 0</span>
+                        </div>
+                        <hr>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="fw-bold text-dark">Total Akhir:</span>
+                            <span class="fw-bold text-success fs-4" id="val-total-akhir">Rp 0</span>
+                        </div>
+                    </div>
+                </div>
+                                <!-- Bagian Form Data Diri di Kolom Kanan -->
+                <div class="col-lg-5">
+                    <div class="card border-0 shadow-sm rounded-4 p-4 bg-white sticky-top" style="top: 85px;">
+                        <h4 class="fw-bold mb-3"><i class="bi bi-person-plus-fill text-warning me-2"></i> Data Diri Siswa</h4>
+                        
+                        <!-- Ubah onsubmit menjadi event biasa atau gunakan tombol type="button" -->
+                        <form id="formPendaftaran">
+                            <div class="mb-3">
+                                <label for="namaLengkap" class="form-label small fw-semibold">Nama Lengkap</label>
+                                <input type="text" class="form-control rounded-3" id="namaLengkap" placeholder="Masukkan nama lengkap" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="emailSiswa" class="form-label small fw-semibold">Alamat Email</label>
+                                <input type="email" class="form-control rounded-3" id="emailSiswa" placeholder="nama@email.com" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="noHp" class="form-label small fw-semibold">Nomor WhatsApp / HP</label>
+                                <input type="tel" class="form-control rounded-3" id="noHp" placeholder="08xxxxxxxxxx" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="pilihProgram" class="form-label small fw-semibold">Program Pilihan</label>
+                                <select class="form-select rounded-3" id="pilihProgram" onchange="updateSelectedCourse(this.value)" required>
+                                    <!-- Diisi via JS -->
+                                </select>
+                            </div>
+                            <!-- Ubah type="submit" menjadi type="button" dengan onclick agar aman dari blokir form validation -->
+                            <button type="button" onclick="handleWhatsAppRegister()" class="btn btn-success w-100 rounded-pill fw-bold py-2 shadow-sm">
+                                <i class="bi bi-whatsapp me-1"></i> Pesan & Kirim via WhatsApp
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-warning text-black text-center py-3 mt-auto">
+        <small class="fw-semibold">&copy; 2026 KodeCamp Indonesia.</small>
+    </footer>
+
+    <!-- Hubungkan File JS Eksternal Data Produk -->
+    <script src="../produkdata.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let selectedCourseIndex = 0;
+
+        // Render Katalog secara Dinamis
+        function renderKatalog() {
+            const container = document.getElementById('katalog-container');
+            const selectDropdown = document.getElementById('pilihProgram');
+            
+            let htmlKatalog = '';
+            let htmlDropdown = '<option value="" disabled>-- Pilih Program --</option>';
+
+            daftarKursus.forEach((kursus, index) => {
+                let activeBorder = (index === selectedCourseIndex) ? 'border border-primary border-2' : '';
+                let iconMarkup = kursus.iconStyle 
+                    ? `<div class="p-4 rounded-4 fs-2 d-inline-block" style="${kursus.iconStyle}"><i class="bi ${kursus.icon}"></i></div>`
+                    : `<div class="${kursus.iconBg} p-4 rounded-4 fs-2 d-inline-block"><i class="bi ${kursus.icon}"></i></div>`;
+
+                htmlKatalog += `
+                    <div class="card shadow-sm rounded-4 mb-3 p-3 ${activeBorder}" id="card-kursus-${index}" style="cursor:pointer;" onclick="selectCourseByIndex(${index})">
+                        <div class="row align-items-center">
+                            <div class="col-md-3 text-center mb-3 mb-md-0">
+                                ${iconMarkup}
+                            </div>
+                            <div class="col-md-9">
+                                <span class="badge ${kursus.badgeClass} mb-1 fw-semibold">${kursus.kategori}</span>
+                                <h5 class="fw-bold mb-1">${kursus.nama}</h5>
+                                <p class="text-muted small mb-2">${kursus.deskripsi}</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="text-success fw-bold">Rp ${kursus.harga.toLocaleString('id-ID')} <small class="text-muted text-decoration-line-through fw-normal">Rp ${kursus.hargaCoret.toLocaleString('id-ID')}</small></span>
+                                    <button type="button" class="btn btn-sm ${index === selectedCourseIndex ? 'btn-primary' : 'btn-outline-primary'} rounded-pill px-3" onclick="event.stopPropagation(); selectCourseByIndex(${index})">
+                                        ${index === selectedCourseIndex ? 'Dipilih' : 'Pilih Program'}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                let selectedAttr = (index === selectedCourseIndex) ? 'selected' : '';
+                htmlDropdown += `<option value="${kursus.nama}" ${selectedAttr}>${kursus.nama}</option>`;
+            });
+
+            container.innerHTML = htmlKatalog;
+            selectDropdown.innerHTML = htmlDropdown;
+            hitungTotal();
+        }
+
+        function selectCourseByIndex(index) {
+            selectedCourseIndex = index;
+            renderKatalog();
+        }
+
+        function updateSelectedCourse(namaProgram) {
+            const foundIndex = daftarKursus.findIndex(k => k.nama === namaProgram);
+            if (foundIndex !== -1) {
+                selectedCourseIndex = foundIndex;
+                renderKatalog();
+            }
+        }
+
+        // Hitung Total Biaya Real-Time
+        function hitungTotal() {
+            const kursus = daftarKursus[selectedCourseIndex];
+            const hargaKursus = kursus.harga;
+            
+            const durasi = parseInt(document.getElementById('durasiMinggu').value) || 1;
+            const biayaDurasi = durasi * 50000;
+            
+            const subtotal = hargaKursus + biayaDurasi;
+
+            const pakaiSertifikat = document.getElementById('checkSertifikat').checked;
+            const biayaSertifikat = pakaiSertifikat ? 50000 : 0;
+
+            const pakaiMagang = document.getElementById('checkMagang').checked;
+            const biayaMagang = pakaiMagang ? 150000 : 0;
+
+            const metode = document.getElementById('metodeBelajar').value;
+            const biayaMetode = (metode.includes('Offline')) ? 250000 : 0;
+
+            const totalSebelumPajak = subtotal + biayaSertifikat + biayaMagang + biayaMetode;
+            const pajak = totalSebelumPajak * 0.10;
+            const totalAkhir = totalSebelumPajak + pajak;
+
+            document.getElementById('label-kursus').innerText = `Harga Kursus (${kursus.nama}):`;
+            document.getElementById('val-harga-kursus').innerText = `Rp ${hargaKursus.toLocaleString('id-ID')}`;
+            document.getElementById('label-durasi').innerText = `Biaya Durasi (${durasi} minggu):`;
+            document.getElementById('val-biaya-durasi').innerText = `Rp ${biayaDurasi.toLocaleString('id-ID')}`;
+            document.getElementById('val-subtotal').innerText = `Rp ${subtotal.toLocaleString('id-ID')}`;
+            document.getElementById('val-sertifikat').innerText = `Rp ${biayaSertifikat.toLocaleString('id-ID')}`;
+            document.getElementById('val-magang').innerText = `Rp ${biayaMagang.toLocaleString('id-ID')}`;
+            document.getElementById('val-metode').innerText = `Rp ${biayaMetode.toLocaleString('id-ID')}`;
+            document.getElementById('val-pajak').innerText = `Rp ${pajak.toLocaleString('id-ID')}`;
+            document.getElementById('val-total-akhir').innerText = `Rp ${totalAkhir.toLocaleString('id-ID')}`;
+        }
+
+        // Mengirimkan Transaksi ke WhatsApp
+        function handleWhatsAppRegister() {
+            const nama = document.getElementById('namaLengkap').value.trim();
+            const email = document.getElementById('emailSiswa').value.trim();
+            const hp = document.getElementById('noHp').value.trim();
+            const kursus = daftarKursus[selectedCourseIndex].nama;
+            const metode = document.getElementById('metodeBelajar').value;
+            const tglMulai = document.getElementById('tanggalMulai').value || '-';
+            const durasi = document.getElementById('durasiMinggu').value;
+            const sertifikat = document.getElementById('checkSertifikat').checked ? 'Ya (+Rp 50.000)' : 'Tidak';
+            const magang = document.getElementById('checkMagang').checked ? 'Ya (+Rp 150.000)' : 'Tidak';
+            const totalAkhir = document.getElementById('val-total-akhir').innerText;
+
+            // Validasi sederhana jika data diri kosong
+            if (!nama || !email || !hp) {
+                alert('Mohon lengkapi data diri Anda (Nama, Email, dan No. WhatsApp) terlebih dahulu!');
+                return;
+            }
+
+            // Susun format teks rapi untuk WhatsApp
+            let teksPesan = `Halo Admin KodeCamp, saya ingin mendaftar kursus IT dengan detail berikut:\n\n` +
+                            `*DATA DIRI*\n` +
+                            `- Nama: ${nama}\n` +
+                            `- Email: ${email}\n` +
+                            `- No. WhatsApp: ${hp}\n\n` +
+                            `*DETAIL PEMESANAN*\n` +
+                            `- Program: ${kursus}\n` +
+                            `- Metode Belajar: ${metode}\n` +
+                            `- Tanggal Mulai: ${tglMulai}\n` +
+                            `- Durasi: ${durasi} Minggu\n` +
+                            `- Sertifikat: ${sertifikat}\n` +
+                            `- Magang: ${magang}\n\n` +
+                            `*Total Pembayaran: ${totalAkhir}*\n\n` +
+                            `Mohon informasikan langkah selanjutnya untuk proses pembayaran. Terima kasih!`;
+
+            // Encode teks agar aman dibaca URL browser
+            const encodedMessage = encodeURIComponent(teksPesan);
+
+            // Nomor WhatsApp Anda
+            const nomorAdminWhatsApp = "6287843893138"; 
+
+            // Buka WhatsApp (menggunakan window.location.href agar langsung mengarahkan halaman tanpa terblokir popup blocker)
+            window.location.href = `https://wa.me/${nomorAdminWhatsApp}?text=${encodedMessage}`;
+        }
+
+        window.onload = function() {
+            const today = new Date().toISOString().split('T')[0];
+            const tglInput = document.getElementById('tanggalMulai');
+            if(tglInput) tglInput.value = today;
+
+            renderKatalog();
+        };
+    </script>
+</body>
+</html>
